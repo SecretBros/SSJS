@@ -1,0 +1,73 @@
+%%[
+set @json = '
+{
+    "order": 
+    {
+      "orderNum": 123456789,
+      "firstName": "Dietrich",
+      "lineItems":
+      [
+        {
+          "sku": "123",
+          "name": "Square",
+          "url": "https://limedash.com?sku=123"
+        },
+        {
+          "sku": "456",
+          "name": "Circle",
+          "url": "https://limedash.com/?sku=456"
+        },
+        {
+          "sku": "789",
+          "name": "Triangle",
+          "url": "https://limedash.com/?sku=789"
+        }
+      ]
+    }
+  }'
+
+SET @rowset=BuildRowsetFromJson(@json,'$.order.lineItems[*]', 1)
+set @totalRows=RowCount(@rowset)
+]%%
+
+%%[
+  /* Extract orderNum and firstName */
+SET @orderfirstName = BuildRowsetFromJson(@json,'$.order.firstName',true)
+SET @basicInfoRow = Row(@orderfirstName,1)
+SET @name = Field(@basicInfoRow,1)
+
+SET @orderNum = BuildRowsetFromJson(@json,'$.order.orderNum',true)
+SET @basicInfo_orderNum = Row(@orderNum,1)
+SET @orderNo = Field(@basicInfo_orderNum,1)
+
+
+
+]%%
+%%[OutputLine(Concat('Name:', @name))]%%
+
+<br>
+
+%%[OutputLine(Concat('orderNo:', @orderNo))]%%
+
+
+<table border=1>
+  <tr>
+     <th>sku</th>
+    <th>name</th>
+    <th>url</th>
+  </tr>
+  
+  %%[FOR @r=1 to @totalRows DO]%%
+  <tr>
+    %%[FOR @C=1 to @totalRows DO]%%
+     <td>
+    %%=Field(Row(@rowset,@r),@C)=%%
+    </td>
+    %%[NEXT @C]%%
+  </tr>
+  
+  %%[NEXT @r]%%
+
+</table>
+
+

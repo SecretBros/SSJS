@@ -1,0 +1,42 @@
+<!-- BuildRowSetFromJSON:-This function creates a row set from an JSON string. 
+It returns an error or an empty row set if there no matches the specified JSON path. -->
+
+<!-- 
+ Syntax:-  BuildRowsetFromJSON(1,2,3) 
+
+
+Ordinal	    Type	Required	Description
+
+1	       String	True	    JSON string to parse into a row set
+2	       String	True	    JSON path selector
+3	      Boolean	True	    When no match is found, a value of 0 returns an error, while a 1 returns an empty row set (NOTE: see Example 3 below)
+ -->
+%%[
+set @json = '{"Flights": [
+    {"Origin": "IND","Dest": "NYC","Price": 100.0},
+    {"Origin": "IND","Dest": "LAX","Price": 200.0},
+    {"Origin": "IND","Dest": "SEA","Price": 500.0,"PerBagSurcharge": 25}
+  ]}'
+set @rowset=BuildRowsetFromJson(@json,'$.Flights[*]', 1)
+set @Count=RowCount(@rows)
+]%%
+
+
+<table border="1">
+    <tr>
+        <th>Origin</th>
+        <th>Dest</th>
+        <th>Price</th>
+        <th>PerBagSurcharge</th>
+    </tr>
+
+%%[For @r=1 To @Count Do]%%
+    <tr>
+       %%[ For @c=1 To 4 Do ]%%
+        <td>%%=Field(Row(@rowset,@r),@c)=%%</td>
+       %%[ Next @c]%%
+    </tr>
+%%[Next @i ]%%
+</table>
+
+

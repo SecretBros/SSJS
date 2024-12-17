@@ -1,0 +1,59 @@
+
+<!--1.LookUp :-This function returns the value of a single column from a Data Extension.
+
+Syntax:-
+  Var @kantoJA
+  Set @kantoJA = Lookup("Name of DE", "Column you want to return", "Name of cloumn you want to search/compare", "Value of Column")
+
+<p>The name of the Kanto region in Japanese is v(@kantoJA)</p>
+-->
+
+
+<!--3.Row():- This function returns a specific row from a row set.
+
+-->
+
+<!-- 5.FormatDate :- This function formats a date/time string in the specified format pattern and locale. 
+ 
+ 
+ -->
+
+%%[<br />
+SET @attended = Lookup("EventLog", "Attended Event", "ID", ID)<br />
+<br />
+IF @attended=="True" THEN<br />
+ SET @LookUpRows=LookUpRows("EventLog","ID",ID)<br />
+  SET @row=Row(@LookUpRows,1)<br />
+  SET @NUMBER=Field(@row,'LuckyDoorPrize')<br />
+
+<br />
+IF @NUMBER== 10 THEN <br />
+SET @tc="#2980b9" <br />
+ELSEIF @NUMBER ==25 THEN <br />
+SET @tc="#2ecc71" <br />
+ELSEIF @NUMBER ==50 THEN <br />
+SET @tc="#c0392b"<br />
+ELSE<br />
+SET @tc="#000000"<br />
+<br />
+ENDIF<br />
+<br />
+]%%<br>
+<br>
+Congratulations You Won Vouchers<br>
+<br>
+<br>
+Voucher Code:-%%=Field(@row,'VoucherPrize')=%%<br>
+<br>
+Voucher Value:-<span style=" color:%%=v(@tc)=%%;">%%=FormatNumber(@NUMBER,"C2","en-US")=%%</span><br>
+<br>
+Use By Date:-%%=FormatDate(DateAdd(Now(),'30','D'),"YYYY-MM-DD"," ","en-US")=%%<br>
+<br>
+%%[<br />
+<br />
+ENDIF<br />
+<br />
+]%%<br>
+<br>
+<br>
+&nbsp;
