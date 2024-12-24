@@ -1,0 +1,92 @@
+%%[
+SET @json = '
+  [{
+
+    "name": "Adarsh Singh",
+    "company": "Cynoteck Technology Solutions",
+    "title": "SFMC Developer",
+    "email": "adarshparmar18@gmail.com",
+
+    "certifications": [
+
+      {
+
+        "name": "Salesforce Marketing Email Specialist",
+
+        "issuedBy": "Salesforce",
+
+        "year": 2024
+
+      },
+
+      {
+
+        "name": "Salesforce Marketing Account Engagement",
+
+        "issuedBy": "Salesforce",
+
+        "year": 2024
+
+      }
+
+    ],
+
+    "hobbies": [
+
+      "Coding",
+
+      "Gym"   
+
+    ]
+
+  }]'
+
+  /* get the basic info*/
+
+  SET @basicInfoRS = BuildRowsetFromJSON(@json,'$.[*]',true)
+
+  SET @basicInfoRow = Row(@basicInfoRS,1)
+
+  SET @name = Field(@basicInfoRow,'name')
+
+  SET @company = Field(@basicInfoRow,'company')
+
+  SET @title = Field(@basicInfoRow,'title')
+
+  SET @email = Field(@basicInfoRow,'email')
+
+  OutputLine(Concat('Name: ', @name))
+
+  OutputLine(Concat('Company: ', @company))
+
+  OutputLine(Concat('Title: ', @title))
+
+  OutputLine(Concat('Email: ', @email))
+
+  /* get the certifications */
+
+  SET @certificationsRS = BuildRowsetFromJSON(@json,'$.[*].certifications[*]',true)
+
+  SET @certificationsRowCount = RowCount(@certificationsRS)
+
+  IF @certificationsRowCount > 0 THEN
+
+  OutputLine(Concat('Certifications: ', v(@certificationsRowCount)))
+
+    FOR @i = 1 TO @certificationsRowCount DO
+
+      SET @certificationsRow = Row(@certificationsRS, @i)
+
+      SET @certificationName = Field(@certificationsRow,'name')
+
+      SET @certificationIssuedBy = Field(@certificationsRow,'issuedBy')
+
+      SET @certificationYear = Field(@certificationsRow,'year')
+
+      OutputLine(Concat(@certificationName, ' - ', @certificationIssuedBy, ' - ', @certificationYear))
+
+    NEXT @i
+ Preview Width (px)  
+
+ 
+

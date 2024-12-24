@@ -1,0 +1,31 @@
+%%[
+/*
+Ref: https://developer.salesforce.com/docs/marketing/marketing-cloud/guide/httppost2.html
+Ref: https://developer.salesforce.com/docs/marketing/marketing-cloud/guide/access-token-s2s.html
+Ref: https://developer.salesforce.com/docs/marketing/marketing-cloud/guide/validateEmail.html
+*/
+
+/*=== (Unsafe) Plain Text API Credentials ===*/
+  SET @client_id = "xxxxxxxxxxxxxxxxxx"
+  SET @client_secret = "xxxxxxxxxxxxxxxxxx"
+  SET @authurl = "https://mcxxxxxxxxxxxx.auth.marketingcloudapis.com/"
+
+/*=== Get SFMC Token ===*/
+  SET @posttoken = HTTPPost2(Concat(@authurl,"v2/token"),"application/json",Concat('{"client_id": "',@client_id,'","client_secret": "',@client_secret,'", "grant_type": "client_credentials"}'),false,@output,@respheader)
+  SET @tokenrows = BuildRowsetFromJson(@output, '$..*', 1)
+  SET @access_token = field(row(@tokenrows,1),"access_token")
+  SET @rest_instance_url = field(row(@tokenrows,1),"rest_instance_url")
+
+/*=== Debug ===*/
+IF 1 == 1 THEN
+ Output(Concat("posttoken: ",@posttoken,"<br>access_token: ",@access_token,"<br>rest_instance_url: ",@rest_instance_url,"<br><br>output: ",@output,"<br><br>"))
+ENDIF
+
+/*=== POST Example SFMC REST API ===*/
+  SET @route = "address/v1/validateEmail"
+  SET @payload = '{"email": "testing@cameronrobert.com.au","validators": [ "SyntaxValidator", "MXValidator", "ListDetectiveValidator" ]}'
+  SET @restapi = HTTPPost2(Concat(@rest_instance_url,@route),"application/json",@payload,false,@results,@respheader,'Authorization', Concat('Bearer ',@access_token))
+]%%
+    
+restapi: %%=v(@restapi)=%% <br>
+output: %%=v(@results)=%% <br>
